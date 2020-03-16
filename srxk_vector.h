@@ -1,5 +1,5 @@
 /*
-* >> srxk_vector.h V0.1.1
+* >> srxk_vector.h
 * A generic C header only vector implementation
 *
 * >> Usage
@@ -133,11 +133,10 @@ static VECTOR *function(push)(VECTOR *v, VECTOR_TYPE data)
 */
 static VECTOR_TYPE function(pop)(VECTOR *v)
 { // TODO add shrink logic
-	// If empty return null
-	if (v->len == 0)
-		return 0;
+	assert(v->len >= 0);
 
-	// Decrease vector length	
+	// Decrease vector length
+	
 	return v->data[--v->len];
 }
 
