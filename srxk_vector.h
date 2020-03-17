@@ -5,9 +5,16 @@
 * >> Usage
 * ```
 * #define VECTOR_TYPE int
-* //                    ^ you can put any valid c type here
+* //                  ^ you can put any valid c type here
 * #include <srxk_vector.h>
 * ```
+* If you want to use a pointer or struct you must first typedef it like so:
+* `typedef struct object* objectp;`
+*
+* Custom memory allocators are also supported via by defining VECTOR_MALLOC, _REALLOC, *_FREE
+* If an error ocurrs an errno will be set relative the vec type convention
+*
+* There some examples in `test/` if you need a guide
 *
 * >> License
 * Be Nice Please Public License 
@@ -28,15 +35,13 @@
 * copies or substantial portions of the Software.
 */
 
-// TODO: switch away from assert to proper error handling
-
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
 // INCLUDES
-#include <stdlib.h> // malloc, alloc, size_t
-#include <assert.h> // assert
+// This an optional header, you can define your own memory allocator to replace these
+#include <stdlib.h> // malloc, realloc, free
 
 // CONSTANTS
 // These can be tweaked for your needs
@@ -58,6 +63,26 @@ extern "C" {
 #define function(name) EVALUATOR(VECTOR, name)
 
 #define VECTOR type(vec, VECTOR_TYPE)
+#define VECTOR_ERRNO EVALUATOR(VECTOR, errno)
+
+// CUSTOM MEMORY MANAGER
+#ifdef CUSTOM_MALLOC
+	// Make sure that realloc and free are also defined
+	#if !defined(CUSTOM_REALLOC) | !defined(CUSTOM_FREE)
+		#error "If a custom malloc is used a custom realloc and free must also be defined"
+	#endif
+	#define malloc CUSTOM_MALLOC
+	#define realloc CUSTOM_REALLOC
+	#define free CUSTOM_FREE
+#endif
+
+// ERROR CODES
+#ifndef ENOMEM
+	#define ENOMEM 12
+#endif
+#ifndef ENODATA
+	#define ENODATA 61
+#endif
 
 // VECTOR TYPE
 typedef struct VECTOR
@@ -67,8 +92,10 @@ typedef struct VECTOR
 	int len;
 } VECTOR;
 
-// VECTOR FUNCTIONS
+// ERROR NUMBER
+int VECTOR_ERRNO;
 
+// VECTOR FUNCTIONS
 /* 
 * Description:
 * 	Create's a new vector
@@ -79,14 +106,21 @@ typedef struct VECTOR
 */
 static VECTOR *function(new)()
 {
+	// Create our vector
 	VECTOR *t;
 	t = (VECTOR*)malloc(sizeof(VECTOR));
-	assert(t != NULL);
+	if (t == NULL) { // If failed set errno and return NULL
+		VECTOR_ERRNO = ENOMEM;
+		return NULL;}
 
+	// Malloc the data and set limits
 	t->data = (void*)malloc(sizeof(VECTOR_TYPE) * VECTOR_START_LENGTH);
 	t->capacity = VECTOR_START_LENGTH;
 	t->len = 0;
-	assert(t->data != NULL);
+
+	if (t->data == NULL) { // If failed set errno and return NULL
+		VECTOR_ERRNO = ENOMEM;
+		return NULL;}
 
 	return t;
 }
@@ -107,19 +141,27 @@ static VECTOR *function(push)(VECTOR *v, VECTOR_TYPE data)
 	if (v->len == v->capacity)
 	{
 		// Grow the capacitiy
-		size_t newsize = v->capacity * VECTOR_GROWTH_FACTOR;
+		int newsize = v->capacity * VECTOR_GROWTH_FACTOR;
 		// If the new size is larger then our growth cap, then just add
 		if (newsize > VECTOR_GROWTH_CAP)
 			v->capacity += VECTOR_GROWTH_CAP_GROWTH;
+		// Other wise just our factor
 		else
 			v->capacity = newsize;
 
-		v->data = (void*)realloc(v->data, sizeof(VECTOR_TYPE) * v->capacity);
-		assert(v->data != NULL);
+		// Resize our data section
+		VECTOR t;
+		t.data = (void*)realloc(v->data, sizeof(VECTOR_TYPE) * v->capacity);
+		if (t.data == NULL) { // If failed set errno and return NULL
+			VECTOR_ERRNO = ENOMEM;
+			return NULL;}
+		else // Other wise set our updated data pointer
+			v->data = t.data;
 	}
+
 	// Set the new data
 	v->data[v->len++] = data;
-	// Return for convenience
+	// Return vector for convenience
 	return v;
 }
 
@@ -133,11 +175,13 @@ static VECTOR *function(push)(VECTOR *v, VECTOR_TYPE data)
 */
 static VECTOR_TYPE function(pop)(VECTOR *v)
 { // TODO add shrink logic
-	assert(v->len >= 0);
-
-	// Decrease vector length
-	
-	return v->data[--v->len];
+	// What is the best way to do this?
+	if(v->len == 0)
+	{
+		VECTOR_ERRNO = ENODATA;
+		return v->data[0];
+	} else
+		return v->data[--v->len];
 }
 
 /* 
@@ -150,7 +194,12 @@ static VECTOR_TYPE function(pop)(VECTOR *v)
 */
 static VECTOR_TYPE function(last)(const VECTOR *v)
 {
-	return v->data[v->len - 1];
+	if(v->len == 0)
+	{
+		VECTOR_ERRNO = ENODATA;
+		return v->data[0];
+	} else
+		return v->data[v->len - 1];
 }
 
 /* 
