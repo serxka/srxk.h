@@ -1,5 +1,5 @@
 /*
-* >> srxk_vector.h
+* >> srxk_vector.h 0.1.2
 * A generic C header only vector implementation
 *
 * >> Usage
@@ -63,7 +63,7 @@ extern "C" {
 #define function(name) EVALUATOR(VECTOR, name)
 
 #define VECTOR type(vec, VECTOR_TYPE)
-#define VECTOR_ERRNO EVALUATOR(VECTOR, errno)
+#define VECTOR_ERR EVALUATOR(VECTOR, err)
 
 // CUSTOM MEMORY MANAGER
 #ifdef CUSTOM_MALLOC
@@ -93,7 +93,7 @@ typedef struct VECTOR
 } VECTOR;
 
 // ERROR NUMBER
-int VECTOR_ERRNO;
+int VECTOR_ERR = 0;
 
 // VECTOR FUNCTIONS
 /* 
@@ -110,16 +110,16 @@ static VECTOR *function(new)()
 	VECTOR *t;
 	t = (VECTOR*)malloc(sizeof(VECTOR));
 	if (t == NULL) { // If failed set errno and return NULL
-		VECTOR_ERRNO = ENOMEM;
+		VECTOR_ERR = ENOMEM;
 		return NULL;}
 
 	// Malloc the data and set limits
-	t->data = (void*)malloc(sizeof(VECTOR_TYPE) * VECTOR_START_LENGTH);
+	t->data = (VECTOR_TYPE*)malloc(sizeof(VECTOR_TYPE) * VECTOR_START_LENGTH);
 	t->capacity = VECTOR_START_LENGTH;
 	t->len = 0;
 
 	if (t->data == NULL) { // If failed set errno and return NULL
-		VECTOR_ERRNO = ENOMEM;
+		VECTOR_ERR = ENOMEM;
 		return NULL;}
 
 	return t;
@@ -151,9 +151,9 @@ static VECTOR *function(push)(VECTOR *v, VECTOR_TYPE data)
 
 		// Resize our data section
 		VECTOR t;
-		t.data = (void*)realloc(v->data, sizeof(VECTOR_TYPE) * v->capacity);
+		t.data = (VECTOR_TYPE*)realloc(v->data, sizeof(VECTOR_TYPE) * v->capacity);
 		if (t.data == NULL) { // If failed set errno and return NULL
-			VECTOR_ERRNO = ENOMEM;
+			VECTOR_ERR = ENOMEM;
 			return NULL;}
 		else // Other wise set our updated data pointer
 			v->data = t.data;
@@ -178,7 +178,7 @@ static VECTOR_TYPE function(pop)(VECTOR *v)
 	// What is the best way to do this?
 	if(v->len == 0)
 	{
-		VECTOR_ERRNO = ENODATA;
+		VECTOR_ERR = ENODATA;
 		return v->data[0];
 	} else
 		return v->data[--v->len];
@@ -196,7 +196,7 @@ static VECTOR_TYPE function(last)(const VECTOR *v)
 {
 	if(v->len == 0)
 	{
-		VECTOR_ERRNO = ENODATA;
+		VECTOR_ERR = ENODATA;
 		return v->data[0];
 	} else
 		return v->data[v->len - 1];
