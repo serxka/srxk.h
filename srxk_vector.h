@@ -93,7 +93,7 @@ typedef struct VECTOR
 } VECTOR;
 
 // ERROR NUMBER
-int VECTOR_ERR = 0;
+static int VECTOR_ERR = 0;
 
 // VECTOR FUNCTIONS
 /* 
