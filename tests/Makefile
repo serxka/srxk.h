@@ -2,7 +2,7 @@ OUTPUT=test
 OBJ=test.o
 
 CFLAGS=-Wall -Wextra -pedantic -I../
-LDFLAGS=
+LDFLAGS=-lm
 
 .PHONY: all clean debug release
 

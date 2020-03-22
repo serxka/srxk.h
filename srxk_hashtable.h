@@ -130,7 +130,7 @@ static int function(gen_hash)(const char* k, const int p, const int m)
 static int function(hash)(const char* k, const int num_b, const int a)
 {
 	int ha = function(gen_hash)(k, 151, num_b);
-	int hb = function(gen_hash)(k, 163, num_b);
+	int hb = function(gen_hash)(k, 149, num_b);
 	return (ha + (a * (hb + 1))) & num_b;
 }
 
