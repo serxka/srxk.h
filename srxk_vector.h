@@ -11,8 +11,8 @@
 * If you want to use a pointer or struct you must first typedef it like so:
 * `typedef struct object* objectp;`
 *
-* Custom memory allocators are also supported via by defining VECTOR_MALLOC, _REALLOC, *_FREE
-* If an error ocurrs an errno will be set relative the vec type convention
+* Custom memory allocators are also supported via by defining CUSTOM_MALLOC, _REALLOC, *_FREE
+* If an error ocurrs an integer called `vec_<type>_err` will be set
 *
 * There some examples in `test/` if you need a guide
 *
@@ -219,6 +219,7 @@ static void function(free)(VECTOR *v)
 // Undefine the macros to keep things clean
 #undef VECTOR
 #undef VECTOR_TYPE
+#undef VECTOR_ERR
 #undef PASTER
 #undef EVALUATOR
 #undef function
