@@ -20,14 +20,42 @@ typedef struct mystruct* mystruct_ptr;
 #include <srxk_vector.h>
 
 
+#define HT_VALUETYPE string
+#define HT_EMPTYVALUE NULL
+#include <srxk_hashtable.h>
+
 #include <stdio.h>
 
+void test_hashtable (void);
 void test_vector (void);
 
 int main (void)
 {
+	printf("/*****VECTOR TEST*****\\\n");
 	test_vector();
+	printf("\n\n/*****HASH TABLE TEST*****\\\n");
+	test_hashtable();
 	return 0;
+}
+
+void test_hashtable (void)
+{
+	ht_string *ht = ht_string_new();
+	ht_string_insert(ht, "test", "gamer1");
+	ht_string_insert(ht, "update", "gamer2");
+	ht_string_insert(ht, "update", "gamer2_updated");
+
+	printf("%s\n", ht_string_search(ht, "test"));
+	printf("%s\n", ht_string_search(ht, "update"));
+
+	ht_string_insert(ht, "delete", "gamer3");
+	ht_string_delete(ht, "delete");
+	string s = ht_string_search(ht, "delete");
+	if (ht_string_err == ENODATA)
+		printf("no data\n");
+	else 
+		printf("%s\n", s);
+	
 }
 
 void test_vector (void)
