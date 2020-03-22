@@ -11,25 +11,26 @@
 * If you want to use a pointer or struct you must first typedef it like so:
 * `typedef struct object* objectp;`
 *
-* Custom memory allocators are also supported via by defining CUSTOM_MALLOC, _REALLOC, *_FREE
+* Custom memory allocators are also supported via by defining CUSTOM_MALLOC,
+* _REALLOC, *_FREE
 * If an error ocurrs an integer called `vec_<type>_err` will be set
 *
 * There some examples in `test/` if you need a guide
 *
 * >> License
-* Be Nice Please Public License 
+* Be Nice Please Public License
 * Version 2, FEBUARY 2020
 * 
 * Copyright (C) 2020 Milo Wheeler <milowheeler@protonmail.com>
 * 
 * Permission is granted, free of charge, to any person obtaining a copy of this
-* "Software", to the rights to, use, copy, modify, merge, publish, distribute, and/or
-* sell copies of the Software without restriction, this holds true as long as the
-* software is not used to intentionally hurt people, and/or communities emotionally
-* or physically.
+* "Software", to the rights to, use, copy, modify, merge, publish, distribute,
+* and/or sell copies of the Software without restriction, this holds true as
+* long as the software is not used to intentionally hurt people, and/or
+* communities emotionally or physically.
 * 
-* Due to the nature of Open Source, no liability or warranty of any kind is provided
-* with this Software.
+* Due to the nature of Open Source, no liability or warranty of any kind is
+* provided with this Software.
 * 
 * The above copyright notice and this permission notice shall be included in all
 * copies or substantial portions of the Software.
@@ -40,11 +41,12 @@ extern "C" {
 #endif // __cplusplus
 
 // INCLUDES
-// This an optional header, you can define your own memory allocator to replace these
+/*This an optional header, you can define your own memory allocator to replace
+these*/
 #include <stdlib.h> // malloc, realloc, free
 
 // CONSTANTS
-// These can be tweaked for your needs
+/*These can be tweaked for your needs*/
 #define VECTOR_START_LENGTH (4)
 #define VECTOR_GROWTH_FACTOR (2)
 #define VECTOR_GROWTH_CAP (32768)
@@ -55,7 +57,6 @@ extern "C" {
 	#define VECTOR_TYPE int
 #endif
 
-// Thank STO for these two: stackoverflow.com/a/1489985
 #define PASTER(x,y) x ## _ ## y
 #define EVALUATOR(x,y)  PASTER(x,y)
 
@@ -69,7 +70,8 @@ extern "C" {
 #ifdef CUSTOM_MALLOC
 	// Make sure that realloc and free are also defined
 	#if !defined(CUSTOM_REALLOC) | !defined(CUSTOM_FREE)
-		#error "If a custom malloc is used a custom realloc and free must also be defined"
+		#error "If a custom malloc is used a custom realloc and free must also\
+				be defined"
 	#endif
 	#define malloc CUSTOM_MALLOC
 	#define realloc CUSTOM_REALLOC
@@ -151,7 +153,8 @@ static VECTOR *function(push)(VECTOR *v, VECTOR_TYPE data)
 
 		// Resize our data section
 		VECTOR t;
-		t.data = (VECTOR_TYPE*)realloc(v->data, sizeof(VECTOR_TYPE) * v->capacity);
+		t.data = (VECTOR_TYPE*)realloc(v->data, sizeof(VECTOR_TYPE) *
+		                                                  v->capacity);
 		if (t.data == NULL) { // If failed set errno and return NULL
 			VECTOR_ERR = ENOMEM;
 			return NULL;}
