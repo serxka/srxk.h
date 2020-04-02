@@ -259,6 +259,19 @@ static void function(free)(HT *ht)
 	free(ht);
 }
 
+// Undefine the macros to keep things clean
+#undef HT
+#undef HT_TYPE
+#undef HT_ITEM
+#undef HT_FREEVALUE
+#undef HT_EMPTYVALUE
+#undef HT_EMPTY
+#undef HT_ERR
+#undef PASTER
+#undef EVALUATOR
+#undef function
+#undef type
+
 #ifdef __cplusplus
 } // extern "C" closing brace
 #endif	// __cplusplus

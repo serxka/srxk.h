@@ -19,15 +19,18 @@ typedef struct mystruct* mystruct_ptr;
 #define VECTOR_TYPE mystruct_ptr
 #include <srxk_vector.h>
 
-
 #define HT_VALUETYPE string
 #define HT_EMPTYVALUE NULL
 #include <srxk_hashtable.h>
+
+#define GAPBUFFER_TYPE char
+#include <srxk_gapbuffer.h>
 
 #include <stdio.h>
 
 void test_hashtable (void);
 void test_vector (void);
+void test_gapbuffer (void);
 
 int main (void)
 {
@@ -35,6 +38,8 @@ int main (void)
 	test_vector();
 	printf("\n\n/*****HASH TABLE TEST*****\\\n");
 	test_hashtable();
+	printf("\n\n/*****GAP BUFFER TEST*****\\\n");
+	test_gapbuffer();
 	return 0;
 }
 
@@ -80,4 +85,9 @@ void test_vector (void)
 	printf("%d\n", vec_mystruct_ptr_last(mv)->x);
 	printf("%s\n", vec_mystruct_ptr_pop(mv)->str);
 	vec_mystruct_ptr_free(mv);
+}
+
+void test_gapbuffer(void)
+{
+	gb_char *gb = gb_char_new(10);
 }
