@@ -10,4 +10,4 @@ A collection of header only data structures and tools.
 * Add srink logic to srxk_vector.h
 * Add resize logic to srxk_hashtable.h
 * Create/'Steal' better hash function for srxk_hashtable.h
-* Comment gapbuffer.h and testing
+* srxk_gapbuffer.h testing
